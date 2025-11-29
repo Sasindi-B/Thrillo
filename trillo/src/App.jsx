@@ -270,6 +270,20 @@ const travellerHotspots = [
   },
 ]
 
+const travelVibes = [
+  'Adventure ready',
+  'Slow travel',
+  'Family friendly',
+  'Luxury stays',
+  'Budget + hostels',
+]
+
+const languageOptions = ['English']
+
+const currencyOptions = ['LKR - Sri Lankan Rupee', 'USD - United States Dollar', 'EUR - Euro']
+
+const timezoneOptions = ['GMT+5:30 | Colombo', 'GMT+0:00 | London', 'GMT+10:00 | Sydney']
+
 function App() {
   const [activePage, setActivePage] = useState('home')
   const [hoveredTrending, setHoveredTrending] = useState(null)
@@ -288,6 +302,26 @@ function App() {
   const [signupPassword, setSignupPassword] = useState('')
   const [signupConfirm, setSignupConfirm] = useState('')
   const [signupMessage, setSignupMessage] = useState('')
+  const [settings, setSettings] = useState({
+    emailAlerts: true,
+    smsAlerts: false,
+    pushAlerts: true,
+    dataSharing: true,
+    autoSaveTrips: true,
+    profileVisibility: 'travellers',
+    language: languageOptions[0],
+    currency: currencyOptions[0],
+    timezone: timezoneOptions[0],
+    travelVibe: travelVibes[0],
+    digest: 'weekly',
+  })
+  const [settingsMessage, setSettingsMessage] = useState('')
+
+  const bottomNavItems = [
+    { label: 'Settings', icon: '⚙️', page: 'settings' },
+    { label: 'Home', icon: '🏠', page: 'home' },
+    { label: 'Profile', icon: '👤', page: 'profile' },
+  ]
 
   const filteredHotspots = travellerHotspots.filter((spot) => {
     if (!travelLocation.trim()) return true
@@ -412,6 +446,18 @@ function App() {
     if (isTravellerLoggedIn) {
       setActivePage('traveller-hotspots')
     }
+  }
+
+  const updateSetting = (key, value) => {
+    setSettings((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const toggleSetting = (key) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const handleSaveSettings = () => {
+    setSettingsMessage('Preferences saved for this session.')
   }
 
   const renderPage = (pageId) => {
@@ -1058,11 +1104,7 @@ function App() {
               </ul>
             </div>
             <nav className="bottom-nav">
-              {[
-                { label: 'Settings', icon: '⚙️', page: 'settings' },
-                { label: 'Home', icon: '🏠', page: 'home' },
-                { label: 'Profile', icon: '👤', page: 'profile' },
-              ].map((nav) => (
+              {bottomNavItems.map((nav) => (
                 <button
                   key={nav.label}
                   className={activePage === nav.page ? 'nav-item active' : 'nav-item'}
@@ -1132,6 +1174,260 @@ function App() {
                 <p className="muted">Sign in as traveller to view tailored hotspots.</p>
               )}
             </div>
+          </section>
+        )
+      case 'settings':
+        return (
+          <section className="page-screen settings-screen">
+            <div className="settings-hero">
+              <div>
+                <p className="badge">Settings</p>
+                <h3>Control your Thrillo experience</h3>
+                <p className="panel-copy">
+                  Tune alerts, privacy, and trip defaults from one calm board.
+                </p>
+              </div>
+              <div className="settings-actions">
+                <button className="cta-button ghost" onClick={() => setActivePage('home')}>
+                  Back to home
+                </button>
+                <button className="cta-button primary" onClick={handleSaveSettings}>
+                  Save changes
+                </button>
+              </div>
+            </div>
+
+            {settingsMessage && (
+              <div className="settings-alert">
+                <span className="pill mini success">Saved</span>
+                <p>{settingsMessage}</p>
+              </div>
+            )}
+
+            <div className="settings-grid">
+              <div className="settings-stack">
+                <div className="settings-card">
+                  <div className="settings-card-header">
+                    <div>
+                      <p className="small-label">Notifications</p>
+                      <h4>Stay in the loop</h4>
+                    </div>
+                    <span className="pill mini success">Live</span>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Email alerts</strong>
+                      <p className="panel-copy">Booking updates, receipts, and itinerary nudges.</p>
+                    </div>
+                    <label className={settings.emailAlerts ? 'toggle on' : 'toggle'}>
+                      <input
+                        type="checkbox"
+                        checked={settings.emailAlerts}
+                        onChange={() => toggleSetting('emailAlerts')}
+                      />
+                      <span className="toggle-handle" />
+                    </label>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>SMS alerts</strong>
+                      <p className="panel-copy">Time-sensitive reminders for check-ins and hosts.</p>
+                    </div>
+                    <label className={settings.smsAlerts ? 'toggle on' : 'toggle'}>
+                      <input
+                        type="checkbox"
+                        checked={settings.smsAlerts}
+                        onChange={() => toggleSetting('smsAlerts')}
+                      />
+                      <span className="toggle-handle" />
+                    </label>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Push notifications</strong>
+                      <p className="panel-copy">Instant alerts on new messages and offers.</p>
+                    </div>
+                    <label className={settings.pushAlerts ? 'toggle on' : 'toggle'}>
+                      <input
+                        type="checkbox"
+                        checked={settings.pushAlerts}
+                        onChange={() => toggleSetting('pushAlerts')}
+                      />
+                      <span className="toggle-handle" />
+                    </label>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Digest cadence</strong>
+                      <p className="panel-copy">How often we send curated collections.</p>
+                    </div>
+                    <select
+                      value={settings.digest}
+                      onChange={(e) => updateSetting('digest', e.target.value)}
+                      className="setting-select"
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="settings-card">
+                  <div className="settings-card-header">
+                    <div>
+                      <p className="small-label">Travel defaults</p>
+                      <h4>Personalize your feed</h4>
+                    </div>
+                    <span className="pill mini">Syncs to mobile</span>
+                  </div>
+                  <div className="settings-fields">
+                    <label className="setting-field">
+                      Language
+                      <select
+                        value={settings.language}
+                        onChange={(e) => updateSetting('language', e.target.value)}
+                      >
+                        {languageOptions.map((language) => (
+                          <option key={language}>{language}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="setting-field">
+                      Currency
+                      <select
+                        value={settings.currency}
+                        onChange={(e) => updateSetting('currency', e.target.value)}
+                      >
+                        {currencyOptions.map((currency) => (
+                          <option key={currency}>{currency}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="setting-field">
+                      Timezone
+                      <select
+                        value={settings.timezone}
+                        onChange={(e) => updateSetting('timezone', e.target.value)}
+                      >
+                        {timezoneOptions.map((zone) => (
+                          <option key={zone}>{zone}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div className="setting-row column">
+                    <div>
+                      <strong>Travel vibe</strong>
+                      <p className="panel-copy">We tailor recommendations around this mood.</p>
+                    </div>
+                    <div className="chip-row">
+                      {travelVibes.map((vibe) => (
+                        <button
+                          key={vibe}
+                          className={
+                            settings.travelVibe === vibe ? 'chip active-chip' : 'chip muted-chip'
+                          }
+                          onClick={() => updateSetting('travelVibe', vibe)}
+                        >
+                          {vibe}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="settings-stack secondary">
+                <div className="settings-card">
+                  <div className="settings-card-header">
+                    <div>
+                      <p className="small-label">Privacy</p>
+                      <h4>Control visibility</h4>
+                    </div>
+                    <span className="pill mini">Profile</span>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Profile visibility</strong>
+                      <p className="panel-copy">Who can see your saved trips and wishlists.</p>
+                    </div>
+                    <select
+                      value={settings.profileVisibility}
+                      onChange={(e) => updateSetting('profileVisibility', e.target.value)}
+                      className="setting-select"
+                    >
+                      <option value="travellers">Travellers only</option>
+                      <option value="hosts">Hosts you message</option>
+                      <option value="private">Just me</option>
+                    </select>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Data sharing</strong>
+                      <p className="panel-copy">Share anonymized usage to improve Thrillo.</p>
+                    </div>
+                    <label className={settings.dataSharing ? 'toggle on' : 'toggle'}>
+                      <input
+                        type="checkbox"
+                        checked={settings.dataSharing}
+                        onChange={() => toggleSetting('dataSharing')}
+                      />
+                      <span className="toggle-handle" />
+                    </label>
+                  </div>
+                  <div className="setting-row">
+                    <div>
+                      <strong>Auto-save trips</strong>
+                      <p className="panel-copy">Keep drafts synced while offline.</p>
+                    </div>
+                    <label className={settings.autoSaveTrips ? 'toggle on' : 'toggle'}>
+                      <input
+                        type="checkbox"
+                        checked={settings.autoSaveTrips}
+                        onChange={() => toggleSetting('autoSaveTrips')}
+                      />
+                      <span className="toggle-handle" />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="settings-card">
+                  <div className="settings-card-header">
+                    <div>
+                      <p className="small-label">Shortcuts</p>
+                      <h4>Account actions</h4>
+                    </div>
+                  </div>
+                  <div className="settings-actions-column">
+                    <button className="cta-button secondary full">Download my data</button>
+                    <button className="cta-button ghost full">Sign out of all devices</button>
+                    <button
+                      className="cta-button primary full"
+                      onClick={() => setActivePage('traveller-hotspots')}
+                    >
+                      Jump to hotspots
+                    </button>
+                  </div>
+                  <p className="panel-copy small">
+                    All changes are stored locally for this demo experience.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <nav className="bottom-nav">
+              {bottomNavItems.map((nav) => (
+                <button
+                  key={nav.label}
+                  className={activePage === nav.page ? 'nav-item active' : 'nav-item'}
+                  onClick={() => setActivePage(nav.page)}
+                >
+                  <span className="nav-icon">{nav.icon}</span>
+                  {nav.label}
+                </button>
+              ))}
+            </nav>
           </section>
         )
       case 'category':
@@ -1262,6 +1558,26 @@ function App() {
           <div className="page-stage">{renderPage(activePage)}</div>
         </div>
       </main>
+      <footer className="site-footer">
+        <div className="footer-brand">
+          <ThrilloLogo size={64} className="footer-logo" />
+          <div>
+            <strong>Thrillo</strong>
+            <p className="panel-copy">Sri Lankan stays, experiences, and hosts.</p>
+          </div>
+        </div>
+        <div className="footer-links">
+          <button className="footer-link" onClick={() => setActivePage('settings')}>
+            Settings
+          </button>
+          <button className="footer-link" onClick={() => setActivePage('home')}>
+            Home
+          </button>
+          <button className="footer-link" onClick={() => setActivePage('traveller-hotspots')}>
+            Hotspots
+          </button>
+        </div>
+      </footer>
     </div>
   )
 }
