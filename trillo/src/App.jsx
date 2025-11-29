@@ -285,6 +285,7 @@ const currencyOptions = ['LKR - Sri Lankan Rupee', 'USD - United States Dollar',
 const timezoneOptions = ['GMT+5:30 | Colombo', 'GMT+0:00 | London', 'GMT+10:00 | Sydney']
 
 function App() {
+  const API_BASE = import.meta.env.VITE_API_BASE || '/api'
   const [activePage, setActivePage] = useState('home')
   const [hoveredTrending, setHoveredTrending] = useState(null)
   const [role, setRole] = useState('traveller')
@@ -302,6 +303,7 @@ function App() {
   const [signupPassword, setSignupPassword] = useState('')
   const [signupConfirm, setSignupConfirm] = useState('')
   const [signupMessage, setSignupMessage] = useState('')
+  const [settingsSaving, setSettingsSaving] = useState(false)
   const [settings, setSettings] = useState({
     emailAlerts: true,
     smsAlerts: false,
@@ -456,8 +458,34 @@ function App() {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  const handleSaveSettings = () => {
-    setSettingsMessage('Preferences saved for this session.')
+  const handleSaveSettings = async () => {
+    setSettingsSaving(true)
+    setSettingsMessage('')
+    const isBusiness = role === 'business'
+    const endpoint = isBusiness
+      ? `${API_BASE}/business-owners/me/settings`
+      : `${API_BASE}/travellers/me/settings`
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+
+      const body = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        const message = body?.message || 'Failed to save settings.'
+        throw new Error(message)
+      }
+
+      setSettingsMessage('Preferences saved to your account.')
+    } catch (error) {
+      setSettingsMessage(error.message || 'Failed to save settings.')
+    } finally {
+      setSettingsSaving(false)
+    }
   }
 
   const renderPage = (pageId) => {
@@ -1191,8 +1219,8 @@ function App() {
                 <button className="cta-button ghost" onClick={() => setActivePage('home')}>
                   Back to home
                 </button>
-                <button className="cta-button primary" onClick={handleSaveSettings}>
-                  Save changes
+                <button className="cta-button primary" onClick={handleSaveSettings} disabled={settingsSaving}>
+                  {settingsSaving ? 'Saving...' : 'Save changes'}
                 </button>
               </div>
             </div>
