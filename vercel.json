@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd trillo && npm ci",
+  "buildCommand": "cd trillo && npm run build",
+  "outputDirectory": "trillo/dist"
+}
