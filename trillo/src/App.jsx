@@ -343,7 +343,7 @@ function App() {
     setAuthLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -392,7 +392,7 @@ function App() {
     setAuthLoading(true)
 
     const isTraveller = normalizedRole === 'traveller'
-    const endpoint = isTraveller ? '/api/travellers/signup' : '/api/business-owners/signup'
+    const endpoint = isTraveller ? `${API_BASE}/travellers/signup` : `${API_BASE}/business-owners/signup`
     const payload = isTraveller
       ? {
           fullName: signupName.trim(),
