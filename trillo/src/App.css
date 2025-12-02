@@ -702,14 +702,53 @@ select:focus {
   gap: 12px;
 }
 
+.hotspot-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(11, 28, 44, 0.06);
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+}
+
+.hotspot-grid.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, rgba(0, 119, 200, 0.16), rgba(0, 196, 204, 0.16));
+  border: 1px solid rgba(0, 119, 200, 0.14);
+}
+
 .hotspot-card {
   background: #fff;
   border-radius: 18px;
   padding: 12px;
   box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  cursor: pointer;
 }
 
 .hotspot-meta {
@@ -736,6 +775,56 @@ select:focus {
 .mini-card {
   min-width: 150px;
   padding-bottom: 8px;
+}
+
+.hotspot-thumb img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.hotspot-body h4 {
+  margin: 4px 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.hotspot-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.two-line {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.hotspot-footer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.cta-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill.mini.secondary {
+  background: rgba(0, 119, 200, 0.12);
+  color: #005b96;
+}
+
+.pill.mini.ghost {
+  background: rgba(11, 28, 44, 0.04);
+  color: rgba(11, 28, 44, 0.7);
 }
 
 .mini-card div {
@@ -866,6 +955,69 @@ select:focus {
   background: #fff;
 }
 
+.details-screen.expanded {
+  gap: 18px;
+}
+
+.details-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.details-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.link-chip {
+  text-decoration: none;
+  color: var(--blue);
+  border: 1px solid rgba(0, 119, 200, 0.2);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.gallery-cell img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+}
+
+.availability-card {
+  background: linear-gradient(120deg, rgba(0, 196, 204, 0.08), rgba(24, 165, 88, 0.08));
+  border: 1px solid rgba(0, 119, 200, 0.08);
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.availability-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sticky-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .carousel {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -923,6 +1075,106 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.booking-screen {
+  background: linear-gradient(180deg, rgba(0, 119, 200, 0.05), rgba(0, 196, 204, 0.06));
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+}
+
+.booking-form-card,
+.booking-summary {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(11, 28, 44, 0.04);
+}
+
+.booking-status {
+  margin: 8px 0;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(11, 28, 44, 0.08);
+  margin: 12px 0;
+}
+
+.confirmation-screen,
+.notifications-screen,
+.payment-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(11, 28, 44, 0.05);
+}
+
+.notification-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-card .small {
+  font-size: 12px;
+}
+
+.payment-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(11, 28, 44, 0.05);
+}
+
+.payment-amount h3 {
+  margin: 6px 0 0;
 }
 
 .settings-screen {
@@ -1503,6 +1755,14 @@ select:focus {
 
   .profile-grid,
   .manage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hotspot-card {
     grid-template-columns: 1fr;
   }
 

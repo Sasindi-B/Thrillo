@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import './App.css'
 
 // Place your logo file in `public/` and name it `thrillo-logo.jpg` (or update this path)
@@ -270,6 +270,18 @@ const travellerHotspots = [
   },
 ]
 
+const ownerBusinessTypes = [
+  'Wellness',
+  'Cafes',
+  'Adventures',
+  'DJs',
+  'Arts',
+  'Special Events',
+  'Gift Items',
+  'Daycares',
+  'Others',
+]
+
 function App() {
   const [activePage, setActivePage] = useState('home')
   const [hoveredTrending, setHoveredTrending] = useState(null)
@@ -288,6 +300,29 @@ function App() {
   const [signupPassword, setSignupPassword] = useState('')
   const [signupConfirm, setSignupConfirm] = useState('')
   const [signupMessage, setSignupMessage] = useState('')
+  const [profile, setProfile] = useState({
+    businessName: 'Mount Heaven',
+    businessType: 'Wellness',
+    description:
+      'Boutique wellness house with artisanal teas, spa rituals, and quiet work corners steps from the lagoon.',
+    email: 'mountheaven@gmail.com',
+    city: 'Colombo',
+    locationLink: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
+    images: [
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80',
+      '',
+      '',
+      '',
+    ],
+  })
+  const [isManagingProfile, setIsManagingProfile] = useState(false)
+  const [profileMessage, setProfileMessage] = useState('')
+  const [profileError, setProfileError] = useState('')
+  const [activeSlot, setActiveSlot] = useState(null)
+  const [showLocationPreview, setShowLocationPreview] = useState(false)
+  const fileInputRef = useRef(null)
 
   const filteredHotspots = travellerHotspots.filter((spot) => {
     if (!travelLocation.trim()) return true
@@ -329,7 +364,10 @@ function App() {
         setActivePage('traveller-hotspots')
       } else {
         setIsTravellerLoggedIn(false)
-        setActivePage('business-login')
+        setIsManagingProfile(false)
+        setProfileMessage('')
+        setProfileError('')
+        setActivePage('profile')
       }
     } catch (error) {
       setAuthError(error.message || 'Login failed. Please try again.')
@@ -391,6 +429,81 @@ function App() {
     } finally {
       setAuthLoading(false)
     }
+  }
+  const handleImageUpload = (fileList, slot = null) => {
+    if (!fileList?.length) return
+    const files = Array.from(fileList)
+
+    setProfile((prev) => {
+      const currentImages = [...prev.images]
+      const existingCount = currentImages.filter(Boolean).length
+      const replacingExisting = slot !== null && currentImages[slot]
+      const nextCount = replacingExisting ? existingCount - 1 + files.length : existingCount + files.length
+
+      if (nextCount > 6) {
+        setProfileError('You can upload up to 6 images.')
+        setProfileMessage('')
+        return prev
+      }
+
+      if (slot !== null && files[0]) {
+        currentImages[slot] = URL.createObjectURL(files[0])
+      } else {
+        let pointer = 0
+        for (let i = 0; i < currentImages.length && pointer < files.length; i += 1) {
+          if (!currentImages[i]) {
+            currentImages[i] = URL.createObjectURL(files[pointer])
+            pointer += 1
+          }
+        }
+
+        while (pointer < files.length && currentImages.length < 6) {
+          currentImages.push(URL.createObjectURL(files[pointer]))
+          pointer += 1
+        }
+      }
+
+      setProfileError('')
+      setProfileMessage('')
+      return { ...prev, images: currentImages.slice(0, 6) }
+    })
+  }
+
+  const handleRemoveImage = (index) => {
+    setProfile((prev) => {
+      const updated = [...prev.images]
+      updated[index] = ''
+      return { ...prev, images: updated }
+    })
+    setProfileError('')
+  }
+
+  const startManagingProfile = () => {
+    setIsManagingProfile(true)
+    setProfileMessage('')
+    setProfileError('')
+  }
+
+  const handleSaveProfile = () => {
+    if (profile.locationLink && !profile.locationLink.startsWith('https://')) {
+      setProfileError('Location link must start with https://')
+      setProfileMessage('')
+      return
+    }
+
+    setProfileError('')
+    setProfileMessage('Profile updated successfully')
+    setIsManagingProfile(false)
+  }
+
+  const toggleLocationPreview = () => {
+    if (!profile.locationLink.startsWith('https://')) {
+      setProfileError('Location link must start with https://')
+      setProfileMessage('')
+      return
+    }
+    setProfileError('')
+    setShowLocationPreview((prev) => !prev)
   }
   const openHotspotPage = () => {
     if (isTravellerLoggedIn) {
@@ -1057,6 +1170,233 @@ function App() {
                 </button>
               ))}
             </nav>
+          </section>
+        )
+      case 'profile':
+        return (
+          <section className="page-screen owner-profile">
+            <div className="profile-header">
+              <button className="icon-circle ghost" onClick={() => setActivePage('home')}>
+                {'<'}
+              </button>
+              <div>
+                <p className="badge">Business</p>
+                <h2>Business Owner Profile</h2>
+                <p className="panel-copy">
+                  Keep your Thrillo presence polished for travellers and partners.
+                </p>
+              </div>
+              <button className="cta-button primary manage" onClick={startManagingProfile}>
+                Manage Your Profile
+              </button>
+            </div>
+
+            {profileMessage && !isManagingProfile && (
+              <div className="toast success floating-toast">{profileMessage}</div>
+            )}
+
+            <div className="profile-grid">
+              <article className="profile-card overview-card">
+                <div className="profile-row">
+                  <div className="profile-icon">BO</div>
+                  <div>
+                    <p className="small-label">Business name</p>
+                    <h3>{profile.businessName}</h3>
+                    <div className="pill soft">{profile.businessType}</div>
+                  </div>
+                </div>
+                <p className="panel-copy">{profile.description.slice(0, 200)}</p>
+                <div className="profile-meta">
+                  <div>
+                    <span className="small-label">Email</span>
+                    <strong>{profile.email}</strong>
+                  </div>
+                  <div>
+                    <span className="small-label">Location</span>
+                    <strong>{profile.city}</strong>
+                  </div>
+                  <div>
+                    <span className="small-label">Gallery</span>
+                    <strong>{profile.images.filter(Boolean).length}/6</strong>
+                  </div>
+                </div>
+              </article>
+              <article className="profile-card gallery-card">
+                <div className="gallery-header">
+                  <div>
+                    <p className="small-label">Live visuals</p>
+                    <h4>Featured gallery</h4>
+                  </div>
+                  <button className="text-link" onClick={startManagingProfile}>
+                    Update images
+                  </button>
+                </div>
+                <div className="profile-gallery">
+                  {profile.images.filter(Boolean).length ? (
+                    profile.images
+                      .filter(Boolean)
+                      .slice(0, 3)
+                      .map((img) => <img key={img} src={img} alt="Business visual" />)
+                  ) : (
+                    <div className="empty-gallery">Add your first image</div>
+                  )}
+                </div>
+                <div className="location-chip">
+                  <span className="icon-circle small map-pin">M</span>
+                  <div>
+                    <p className="small-label">Google Maps link</p>
+                    <strong className="link-text">
+                      {profile.locationLink || 'Add a map link'}
+                    </strong>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            {isManagingProfile && (
+              <article className="manage-card">
+                <div className="manage-header">
+                  <div>
+                    <p className="badge">Manage Your Profile</p>
+                    <h3>Images and location</h3>
+                    <p className="panel-copy">
+                      Upload up to 6 landscape shots and keep your map pin fresh.
+                    </p>
+                  </div>
+                  <div className="toast-stack">
+                    {profileError ? <div className="toast error">{profileError}</div> : null}
+                    {profileMessage ? <div className="toast success">{profileMessage}</div> : null}
+                  </div>
+                </div>
+                <div className="manage-grid">
+                  <div className="upload-panel">
+                    <div className="image-grid">
+                      {profile.images.map((img, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          className={img ? 'image-slot filled' : 'image-slot'}
+                          onClick={() => {
+                            setActiveSlot(index)
+                            if (fileInputRef.current) fileInputRef.current.click()
+                          }}
+                        >
+                          {img ? (
+                            <img src={img} alt={`Business ${index + 1}`} />
+                          ) : (
+                            <div className="image-placeholder">
+                              <span className="plus">+ Add Image</span>
+                              <p>Landscape works best. Auto-crops on upload.</p>
+                            </div>
+                          )}
+                          <div className="slot-hover">
+                            <span>Replace</span>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                handleRemoveImage(index)
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="helper-text muted">Max 6 images. JPG/PNG supported.</p>
+                  </div>
+                  <div className="location-panel">
+                    <label className="location-label">
+                      Business type
+                      <select
+                        value={profile.businessType}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, businessType: e.target.value }))
+                        }
+                      >
+                        {ownerBusinessTypes.map((type) => (
+                          <option key={type}>{type}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="location-label">
+                      Short business description
+                      <textarea
+                        rows={3}
+                        maxLength={200}
+                        value={profile.description}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, description: e.target.value }))
+                        }
+                        placeholder="Max 200 characters"
+                      />
+                      <span className="helper-text">
+                        {200 - profile.description.length} characters left
+                      </span>
+                    </label>
+                    <label className="location-label">
+                      Google Maps Location Link
+                      <div className="input-with-icon">
+                        <span className="icon-circle small map-pin">M</span>
+                        <input
+                          type="url"
+                          placeholder="https://maps.google.com/..."
+                          value={profile.locationLink}
+                          onChange={(e) =>
+                            setProfile((prev) => ({ ...prev, locationLink: e.target.value }))
+                          }
+                        />
+                      </div>
+                    </label>
+                    <div className="location-preview-row">
+                      <button className="cta-button ghost" type="button" onClick={toggleLocationPreview}>
+                        Preview Location
+                      </button>
+                      {showLocationPreview && profile.locationLink.startsWith('https://') && (
+                        <div className="map-preview">
+                          <iframe
+                            title="Map preview"
+                            src={profile.locationLink}
+                            loading="lazy"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="manage-actions">
+                      <button
+                        type="button"
+                        className="cta-button ghost"
+                        onClick={() => {
+                          setIsManagingProfile(false)
+                          setProfileError('')
+                          setProfileMessage('')
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button className="cta-button primary" type="button" onClick={handleSaveProfile}>
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              style={{ display: 'none' }}
+              onChange={(event) => {
+                handleImageUpload(event.target.files, activeSlot)
+                setActiveSlot(null)
+                event.target.value = ''
+              }}
+            />
           </section>
         )
       case 'traveller-hotspots':

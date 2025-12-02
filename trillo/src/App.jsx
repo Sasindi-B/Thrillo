@@ -219,6 +219,88 @@ const businessDetails = {
   ],
 }
 
+const hotspotBusinesses = [
+  {
+    id: 'mount-heaven',
+    name: 'Mount Heaven',
+    category: 'Wellness',
+    location: 'Colombo',
+    mapUrl: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
+    description:
+      'Boutique wellness house with artisanal teas, spa rituals, and quiet work corners steps from the lagoon.',
+    preview:
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80',
+    ],
+    availability: ['Jan 12 - 10:00 AM', 'Jan 13 - 4:00 PM', 'Jan 14 - 9:30 AM'],
+    price: 'LKR 18,000',
+  },
+  {
+    id: 'lagoon-glow',
+    name: 'Lagoon Glow Spa & Retreat',
+    category: 'Wellness',
+    location: 'Bentota',
+    mapUrl: 'https://maps.google.com/?q=Bentota+Sri+Lanka',
+    description:
+      'Holistic Sri Lankan wellness experiences blending Ayurveda, ocean-inspired therapies, and mindful movement.',
+    preview:
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1506439773649-6e0e29c6f30d?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+    ],
+    availability: ['Jan 18 - 8:00 AM', 'Jan 19 - 6:00 PM', 'Jan 21 - 11:00 AM'],
+    price: 'LKR 22,500',
+  },
+  {
+    id: 'colombo-spice',
+    name: 'Colombo Spice Cafe',
+    category: 'Cafes',
+    location: 'Colombo',
+    mapUrl: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
+    description:
+      'Signature Lankan spices with modern brews, rooftop sunsets, and live acoustic sets every weekend.',
+    preview:
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1544145945-f90425340c7b?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80',
+    ],
+    availability: ['Tonight - 7:00 PM', 'Tomorrow - 6:30 PM'],
+    price: 'LKR 9,500',
+  },
+  {
+    id: 'jungle-pulse',
+    name: 'Jungle Pulse Adventures',
+    category: 'Adventures',
+    location: 'Kitulgala',
+    mapUrl: 'https://maps.google.com/?q=Kitulgala+Sri+Lanka',
+    description:
+      'White-water rafting, canyoning, and rainforest trails led by certified safety-first guides.',
+    preview:
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+    ],
+    availability: ['Jan 15 - 8:00 AM', 'Jan 16 - 2:30 PM'],
+    price: 'LKR 14,800',
+  },
+]
+
+const travellerContact = {
+  name: 'Maya Perera',
+  email: 'maya@example.com',
+  phone: '+94 77 123 4567',
+}
+
 const reviews = [
   {
     name: 'Maya',
@@ -304,6 +386,9 @@ function App() {
   const [authMode, setAuthMode] = useState('login')
   const [isTravellerLoggedIn, setIsTravellerLoggedIn] = useState(false)
   const [travelLocation, setTravelLocation] = useState('')
+  const [hotspotSearch, setHotspotSearch] = useState('')
+  const [hotspotCategory, setHotspotCategory] = useState('All')
+  const [selectedBusiness, setSelectedBusiness] = useState(hotspotBusinesses[0])
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
   const [authError, setAuthError] = useState('')
@@ -353,6 +438,18 @@ function App() {
     digest: 'weekly',
   })
   const [settingsMessage, setSettingsMessage] = useState('')
+  const [bookingForm, setBookingForm] = useState({
+    startDate: '',
+    endDate: '',
+    people: 2,
+    notes: '',
+  })
+  const [bookingStatus, setBookingStatus] = useState('')
+  const [notifications, setNotifications] = useState({
+    traveller: [],
+    owner: [],
+  })
+  const [activeNotificationTab, setActiveNotificationTab] = useState('traveller')
 
   const bottomNavItems = [
     { label: 'Settings', icon: '⚙️', page: 'settings' },
@@ -363,6 +460,15 @@ function App() {
   const filteredHotspots = travellerHotspots.filter((spot) => {
     if (!travelLocation.trim()) return true
     return spot.location.toLowerCase().includes(travelLocation.trim().toLowerCase())
+  })
+
+  const filteredBusinesses = hotspotBusinesses.filter((biz) => {
+    const matchesCategory = hotspotCategory === 'All' || biz.category === hotspotCategory
+    const matchesSearch =
+      !hotspotSearch.trim() ||
+      biz.name.toLowerCase().includes(hotspotSearch.trim().toLowerCase()) ||
+      biz.location.toLowerCase().includes(hotspotSearch.trim().toLowerCase())
+    return matchesCategory && matchesSearch
   })
 
   const handleLogin = async () => {
@@ -494,6 +600,91 @@ function App() {
 
   const toggleSetting = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const openBusinessDetails = (biz) => {
+    setSelectedBusiness(biz)
+    setActivePage('business-details')
+  }
+
+  const resetBookingForm = () => {
+    setBookingForm({
+      startDate: '',
+      endDate: '',
+      people: 2,
+      notes: '',
+    })
+    setBookingStatus('')
+  }
+
+  const handleBookingSubmit = () => {
+    if (!selectedBusiness) return
+    if (!bookingForm.startDate || !bookingForm.endDate) {
+      setBookingStatus('Please select a date range')
+      return
+    }
+
+    const bookingId = `bk-${Date.now()}`
+    const dates = `${bookingForm.startDate} to ${bookingForm.endDate}`
+
+    setNotifications((prev) => ({
+      traveller: [
+        {
+          id: bookingId,
+          title: 'Booking request sent',
+          body: `${selectedBusiness.name} · ${dates}`,
+          status: 'Pending',
+          timestamp: 'Just now',
+          people: bookingForm.people,
+        },
+        ...prev.traveller,
+      ],
+      owner: [
+        {
+          id: bookingId,
+          title: 'New booking request',
+          body: `${travellerContact.name} · ${dates}`,
+          status: 'Pending',
+          timestamp: 'Just now',
+          people: bookingForm.people,
+          contact: `${travellerContact.email} · ${travellerContact.phone}`,
+          businessName: selectedBusiness.name,
+        },
+        ...prev.owner,
+      ],
+    }))
+
+    setBookingStatus('submitted')
+    setActiveNotificationTab('traveller')
+    setActivePage('booking-confirmation')
+  }
+
+  const handleOwnerDecision = (bookingId, decision) => {
+    setNotifications((prev) => {
+      const nextOwner = prev.owner.map((n) =>
+        n.id === bookingId ? { ...n, status: decision === 'accept' ? 'Accepted' : 'Declined' } : n
+      )
+      const nextTraveller = [...prev.traveller]
+      if (decision === 'accept') {
+        nextTraveller.unshift({
+          id: `${bookingId}-accepted`,
+          title: 'Booking accepted',
+          body: 'Proceed to payment to confirm your spot.',
+          status: 'Accepted',
+          timestamp: 'Just now',
+        })
+        setBookingStatus('accepted')
+      } else {
+        nextTraveller.unshift({
+          id: `${bookingId}-declined`,
+          title: 'Booking declined',
+          body: 'The business owner declined this request.',
+          status: 'Declined',
+          timestamp: 'Just now',
+        })
+      }
+      return { traveller: nextTraveller, owner: nextOwner }
+    })
   }
 
   const handleSaveSettings = async () => {
@@ -741,7 +932,7 @@ function App() {
                 <label className="checkbox">
                   <input type="checkbox" /> Keep me signed in
                 </label>
-                <button className="text-link">Forgot password?</button>
+                <button className="text-link">Forgot password-</button>
               </div>
               {authError && (
                 <p className="helper-text" style={{ color: '#b00020' }}>
@@ -752,7 +943,7 @@ function App() {
                 {authLoading ? 'Logging in...' : 'Log In'}
               </button>
               <p className="helper-text">
-                New partner? <span>Create an account</span>
+                New partner- <span>Create an account</span>
               </p>
             </div>
             <div className="login-illustration">
@@ -878,7 +1069,7 @@ function App() {
                 <label className="checkbox">
                   <input type="checkbox" /> Remember me
                 </label>
-                <button className="text-link">Forgot password?</button>
+                <button className="text-link">Forgot password-</button>
               </div>
               {authError && (
                 <p className="helper-text" style={{ color: '#b00020' }}>
@@ -889,7 +1080,7 @@ function App() {
                 {authLoading ? 'Logging in...' : 'Log In'}
               </button>
               <p className="helper-text">
-                First time here? <span>Create a traveller profile</span>
+                First time here- <span>Create a traveller profile</span>
               </p>
             </div>
             <div className="login-illustration">
@@ -944,15 +1135,15 @@ function App() {
                 </div>
                 <div className="role-switch">
                   {['traveller', 'business'].map((option) => (
-                  <button
-                    key={option}
-                    className={role === option ? 'role-chip active' : 'role-chip'}
-                    onClick={() => {
-                      setRole(option)
-                      setAuthError('')
-                      setSignupMessage('')
-                    }}
-                  >
+                    <button
+                      key={option}
+                      className={role === option ? 'role-chip active' : 'role-chip'}
+                      onClick={() => {
+                        setRole(option)
+                        setAuthError('')
+                        setSignupMessage('')
+                      }}
+                    >
                       <span className="role-dot" />
                       {option === 'traveller' ? 'Traveller' : 'Business Owner'}
                     </button>
@@ -1261,60 +1452,338 @@ function App() {
         )
       case 'traveller-hotspots':
         return (
-          <section className="page-screen home-screen">
+          <section className="page-screen hotspots-screen">
             <div className="location-header">
               <div>
                 <p className="badge">Traveller</p>
-                <h3>Hotspots near your next stop</h3>
-                <p className="panel-copy">
-                  Add a city or area to see curated hotspots and nearby businesses.
-                </p>
+                <h3>Hotspots</h3>
+                <p className="panel-copy">Search, filter, and open any business to view details.</p>
               </div>
               <button className="cta-button ghost" onClick={() => setActivePage('home')}>
                 Back to home
               </button>
             </div>
-            <div className="location-form">
-              <label>
-                Travel location
+
+            <div className="hotspot-controls">
+              <div className="search-bar">
+                <span className="icon-circle small">🔍</span>
                 <input
-                  placeholder="e.g., Ella, Mirissa, Galle"
-                  value={travelLocation}
-                  onChange={(e) => setTravelLocation(e.target.value)}
-                  disabled={!isTravellerLoggedIn}
+                  placeholder="Search businesses or locations"
+                  value={hotspotSearch}
+                  onChange={(e) => setHotspotSearch(e.target.value)}
                 />
-              </label>
-              <div className="location-helper">
-                {isTravellerLoggedIn
-                  ? 'We match nearby businesses registered on Trillo.'
-                  : 'Log in as a traveller on the home page to start exploring hotspots.'}
+              </div>
+              <div className="chip-row">
+                {['All', ...new Set(hotspotBusinesses.map((b) => b.category))].map((cat) => (
+                  <button
+                    key={cat}
+                    className={hotspotCategory === cat ? 'chip active-chip' : 'chip muted-chip'}
+                    onClick={() => setHotspotCategory(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="hotspot-grid">
-              {isTravellerLoggedIn ? (
-                filteredHotspots.map((spot) => (
-                  <article key={spot.title} className="hotspot-card">
-                    <div>
-                      <strong>{spot.title}</strong>
-                      <p className="muted">
-                        {spot.location} - {spot.category}
-                      </p>
+
+            <div className="hotspot-grid cards">
+              {filteredBusinesses.map((biz) => (
+                <article
+                  key={biz.id}
+                  className="hotspot-card gradient-border"
+                  onClick={() => openBusinessDetails(biz)}
+                >
+                  <div className="hotspot-thumb">
+                    <img src={biz.preview || biz.images[0]} alt={biz.name} />
+                  </div>
+                  <div className="hotspot-body">
+                    <div className="hotspot-top">
+                      <p className="small-label">{biz.category}</p>
+                      <span className="pill mini">{biz.location}</span>
                     </div>
-                    <div className="hotspot-meta">
-                      <span className="pill mini">* {spot.rating}</span>
-                      <div className="chip-row">
-                        {spot.businesses.map((biz) => (
-                          <span key={biz} className="chip small">
-                            {biz}
-                          </span>
-                        ))}
-                      </div>
+                    <h4>{biz.name}</h4>
+                    <p className="muted two-line">{biz.description}</p>
+                    <div className="hotspot-footer">
+                      <span className="pill mini secondary">{biz.availability[0] || 'Available'}</span>
+                      <span className="pill mini ghost">{biz.images.length}/6</span>
                     </div>
-                  </article>
-                ))
-              ) : (
-                <p className="muted">Sign in as traveller to view tailored hotspots.</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )
+      case 'business-details':
+        if (!selectedBusiness) return null
+        return (
+          <section className="page-screen details-screen expanded">
+            <div className="details-hero">
+              <div>
+                <p className="badge">Business</p>
+                <h3>{selectedBusiness.name}</h3>
+                <div className="details-meta">
+                  <span className="pill mini">{selectedBusiness.category}</span>
+                  <a
+                    className="pill mini link-chip"
+                    href={selectedBusiness.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    📍 {selectedBusiness.location}
+                  </a>
+                </div>
+                <p className="panel-copy">{selectedBusiness.description}</p>
+              </div>
+              <button className="cta-button primary" onClick={() => setActivePage('booking')}>
+                Book This Place
+              </button>
+            </div>
+
+            <div className="gallery-grid">
+              {selectedBusiness.images.map((img, idx) => (
+                <div key={img} className="gallery-cell">
+                  <img src={img} alt={`${selectedBusiness.name} ${idx + 1}`} />
+                </div>
+              ))}
+            </div>
+
+            <div className="availability-card">
+              <div>
+                <p className="small-label">Availability</p>
+                <h4>Open slots</h4>
+              </div>
+              <div className="availability-list">
+                {selectedBusiness.availability.map((slot) => (
+                  <span key={slot} className="pill mini">
+                    {slot}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="details-actions sticky-actions">
+              <button className="cta-button ghost" onClick={() => setActivePage('traveller-hotspots')}>
+                Back to Hotspots
+              </button>
+              <div className="cta-row">
+                <button className="cta-button secondary" onClick={() => setActivePage('notifications')}>
+                  View notifications
+                </button>
+                <button className="cta-button primary" onClick={() => setActivePage('booking')}>
+                  Book This Place
+                </button>
+              </div>
+            </div>
+          </section>
+        )
+      case 'booking':
+        return (
+          <section className="page-screen booking-screen">
+            <div className="booking-header">
+              <div>
+                <p className="badge">Booking</p>
+                <h3>Reserve {selectedBusiness?.name || 'a place'}</h3>
+                <p className="panel-copy">
+                  Select dates, group size, and add any notes. Contact details auto-filled.
+                </p>
+              </div>
+              <button className="cta-button ghost" onClick={() => setActivePage('business-details')}>
+                Back to details
+              </button>
+            </div>
+
+            <div className="booking-grid">
+              <div className="booking-form-card">
+                <div className="input-group two-column">
+                  <label>
+                    Start date
+                    <input
+                      type="date"
+                      value={bookingForm.startDate}
+                      onChange={(e) => setBookingForm((prev) => ({ ...prev, startDate: e.target.value }))}
+                    />
+                  </label>
+                  <label>
+                    End date
+                    <input
+                      type="date"
+                      value={bookingForm.endDate}
+                      onChange={(e) => setBookingForm((prev) => ({ ...prev, endDate: e.target.value }))}
+                    />
+                  </label>
+                </div>
+                <div className="input-group two-column">
+                  <label>
+                    Number of people
+                    <input
+                      type="number"
+                      min="1"
+                      max="12"
+                      value={bookingForm.people}
+                      onChange={(e) =>
+                        setBookingForm((prev) => ({ ...prev, people: Number(e.target.value || 1) }))
+                      }
+                    />
+                  </label>
+                  <label>
+                    Notes (optional)
+                    <input
+                      placeholder="Occasion, preferences, etc."
+                      value={bookingForm.notes}
+                      onChange={(e) => setBookingForm((prev) => ({ ...prev, notes: e.target.value }))}
+                    />
+                  </label>
+                </div>
+                <div className="input-group two-column">
+                  <label>
+                    Traveller name
+                    <input value={travellerContact.name} readOnly />
+                  </label>
+                  <label>
+                    Traveller contact
+                    <input value={`${travellerContact.email} / ${travellerContact.phone}`} readOnly />
+                  </label>
+                </div>
+
+                {bookingStatus && bookingStatus !== 'submitted' && (
+                  <p className="booking-status muted">{bookingStatus}</p>
+                )}
+
+                <div className="cta-row">
+                  <button className="cta-button ghost" onClick={resetBookingForm}>
+                    Clear
+                  </button>
+                  <button className="cta-button primary" onClick={handleBookingSubmit}>
+                    Confirm Booking
+                  </button>
+                </div>
+              </div>
+
+              <div className="booking-summary">
+                <div className="summary-card">
+                  <p className="small-label">You are booking</p>
+                  <h4>{selectedBusiness?.name}</h4>
+                  <p className="muted">{selectedBusiness?.location}</p>
+                  <div className="pill mini ghost">{selectedBusiness?.category}</div>
+                  <div className="divider" />
+                  <p className="muted">Expected amount</p>
+                  <h3>{selectedBusiness?.price}</h3>
+                </div>
+              </div>
+            </div>
+          </section>
+        )
+      case 'booking-confirmation':
+        return (
+          <section className="page-screen confirmation-screen">
+            <p className="badge">Booking</p>
+            <h3>Your booking request has been sent to the business owner.</h3>
+            <p className="panel-copy">
+              We will notify you when the owner accepts. You can monitor updates in the notification
+              center.
+            </p>
+            <div className="cta-row">
+              <button className="cta-button secondary" onClick={() => setActivePage('notifications')}>
+                View notifications
+              </button>
+              <button className="cta-button primary" onClick={() => setActivePage('traveller-hotspots')}>
+                Back to hotspots
+              </button>
+            </div>
+          </section>
+        )
+      case 'notifications':
+        return (
+          <section className="page-screen notifications-screen">
+            <div className="notification-header">
+              <div>
+                <p className="badge">Notifications</p>
+                <h3>Inbox</h3>
+              </div>
+              <div className="chip-row">
+                <button
+                  className={activeNotificationTab === 'traveller' ? 'chip active-chip' : 'chip muted-chip'}
+                  onClick={() => setActiveNotificationTab('traveller')}
+                >
+                  Traveller Notifications
+                </button>
+                <button
+                  className={activeNotificationTab === 'owner' ? 'chip active-chip' : 'chip muted-chip'}
+                  onClick={() => setActiveNotificationTab('owner')}
+                >
+                  Business Owner Notifications
+                </button>
+              </div>
+            </div>
+
+            <div className="notification-list">
+              {(notifications[activeNotificationTab] || []).map((item) => (
+                <article key={item.id} className="notification-card">
+                  <div>
+                    <div className="notification-top">
+                      <strong>{item.title}</strong>
+                      <span className={`pill mini ${item.status?.toLowerCase()}`}>{item.status}</span>
+                    </div>
+                    <p className="muted">{item.body}</p>
+                    {item.people && (
+                      <p className="muted small">People: {item.people}</p>
+                    )}
+                    {item.contact && <p className="muted small">Contact: {item.contact}</p>}
+                    {item.businessName && <p className="muted small">Business: {item.businessName}</p>}
+                  </div>
+                  {activeNotificationTab === 'owner' && item.status === 'Pending' && (
+                    <div className="cta-row">
+                      <button className="cta-button ghost" onClick={() => handleOwnerDecision(item.id, 'decline')}>
+                        Decline
+                      </button>
+                      <button className="cta-button primary" onClick={() => handleOwnerDecision(item.id, 'accept')}>
+                        Accept
+                      </button>
+                    </div>
+                  )}
+                </article>
+              ))}
+              {(notifications[activeNotificationTab] || []).length === 0 && (
+                <p className="muted">No notifications yet.</p>
               )}
+            </div>
+
+            <div className="cta-row">
+              <button className="cta-button ghost" onClick={() => setActivePage('traveller-hotspots')}>
+                Back to hotspots
+              </button>
+              <button className="cta-button primary" onClick={() => setActivePage('payment')}>
+                Go to payment
+              </button>
+            </div>
+          </section>
+        )
+      case 'payment':
+        return (
+          <section className="page-screen payment-screen">
+            <p className="badge">Payment</p>
+            <h3>Pay to confirm your booking</h3>
+            <p className="panel-copy">
+              Once the owner accepts, complete payment to secure your spot.
+            </p>
+            <div className="payment-card">
+              <div>
+                <p className="small-label">Business</p>
+                <h4>{selectedBusiness?.name}</h4>
+                <p className="muted">{selectedBusiness?.location}</p>
+              </div>
+              <div className="payment-amount">
+                <p className="muted">Amount</p>
+                <h3>{selectedBusiness?.price}</h3>
+              </div>
+            </div>
+            <div className="cta-row">
+              <button className="cta-button ghost" onClick={() => setActivePage('notifications')}>
+                Back
+              </button>
+              <button className="cta-button primary" onClick={() => setActivePage('traveller-hotspots')}>
+                Pay Now (demo)
+              </button>
             </div>
           </section>
         )
@@ -1378,7 +1847,7 @@ function App() {
                   </button>
                 </div>
                 <div className="profile-gallery">
-                  {profile.images.filter(Boolean).length ? (
+                    {profile.images.filter(Boolean).length ? (
                     profile.images
                       .filter(Boolean)
                       .slice(0, 3)
@@ -1952,4 +2421,5 @@ function App() {
 }
 
 export default App
+
 
