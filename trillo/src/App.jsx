@@ -406,6 +406,7 @@ function App() {
     description:
       'Boutique wellness house with artisanal teas, spa rituals, and quiet work corners steps from the lagoon.',
     email: 'mountheaven@gmail.com',
+    location: 'Colombo, Sri Lanka',
     city: 'Colombo',
     locationLink: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
     images: [
@@ -422,6 +423,7 @@ function App() {
   const [profileError, setProfileError] = useState('')
   const [activeSlot, setActiveSlot] = useState(null)
   const [showLocationPreview, setShowLocationPreview] = useState(false)
+  const [profileSaving, setProfileSaving] = useState(false)
   const fileInputRef = useRef(null)
   const [settingsSaving, setSettingsSaving] = useState(false)
   const [settings, setSettings] = useState({
@@ -771,16 +773,73 @@ function App() {
     setProfileError('')
   }
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    const trimmedLocation = (profile.location || '').trim()
+
+    if (trimmedLocation.length > 200) {
+      setProfileError('Location must be 200 characters or less.')
+      setProfileMessage('')
+      return
+    }
+
     if (profile.locationLink && !profile.locationLink.startsWith('https://')) {
       setProfileError('Location link must start with https://')
       setProfileMessage('')
       return
     }
 
+    const payload = {
+      businessType: profile.businessType,
+      description: profile.description,
+      googleMapsUrl: profile.locationLink || '',
+      location: trimmedLocation,
+      imageUrls: profile.images.filter(Boolean),
+    }
+
+    setProfileSaving(true)
     setProfileError('')
-    setProfileMessage('Profile updated successfully')
-    setIsManagingProfile(false)
+    setProfileMessage('')
+
+    try {
+      const response = await fetch(`${API_BASE}/business-owners/me/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      const body = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        const message = body?.message || 'Failed to update profile.'
+        throw new Error(message)
+      }
+
+      const updatedProfile = body?.profile || {}
+      setProfile((prev) => {
+        const nextLocation = updatedProfile.location ?? trimmedLocation
+        const nextDescription = updatedProfile.description ?? prev.description
+        const nextLocationLink = updatedProfile.googleMapsUrl ?? prev.locationLink
+        const incomingImages = updatedProfile.imageUrls ?? prev.images
+        const paddedImages = [...incomingImages]
+        while (paddedImages.length < 6) paddedImages.push('')
+
+        return {
+          ...prev,
+          ...updatedProfile,
+          description: nextDescription,
+          location: nextLocation,
+          locationLink: nextLocationLink,
+          images: paddedImages.slice(0, 6),
+        }
+      })
+      setProfileMessage('Profile updated successfully')
+      setIsManagingProfile(false)
+    } catch (error) {
+      setProfileError(error.message || 'Failed to update profile.')
+      setProfileMessage('')
+    } finally {
+      setProfileSaving(false)
+    }
   }
 
   const toggleLocationPreview = () => {
@@ -1827,8 +1886,8 @@ function App() {
                     <strong>{profile.email}</strong>
                   </div>
                   <div>
-                    <span className="small-label">Location</span>
-                    <strong>{profile.city}</strong>
+                    <span className="small-label">Business location</span>
+                    <strong>{profile.location?.trim() || profile.city || 'No location set'}</strong>
                   </div>
                   <div>
                     <span className="small-label">Gallery</span>
@@ -1936,6 +1995,21 @@ function App() {
                       </select>
                     </label>
                     <label className="location-label">
+                      Business location
+                      <input
+                        type="text"
+                        maxLength={200}
+                        placeholder="Enter business location"
+                        value={profile.location || ''}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, location: e.target.value }))
+                        }
+                      />
+                      <span className="helper-text">
+                        {Math.max(0, 200 - (profile.location?.length || 0))} characters left
+                      </span>
+                    </label>
+                    <label className="location-label">
                       Short business description
                       <textarea
                         rows={3}
@@ -1992,8 +2066,13 @@ function App() {
                       >
                         Cancel
                       </button>
-                      <button className="cta-button primary" type="button" onClick={handleSaveProfile}>
-                        Save Changes
+                      <button
+                        className="cta-button primary"
+                        type="button"
+                        onClick={handleSaveProfile}
+                        disabled={profileSaving}
+                      >
+                        {profileSaving ? 'Saving...' : 'Save Changes'}
                       </button>
                     </div>
                   </div>
