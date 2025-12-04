@@ -779,6 +779,7 @@ function App() {
     const trimmedLocation = (profile.location || '').trim()
     const trimmedDescription = (profile.description || '').trim()
     const trimmedLink = (profile.locationLink || '').trim()
+    const ownerIdentifier = (profile.email || '').trim() || 'me'
 
     if (trimmedLocation.length > 200) {
       setProfileError('Location must be 200 characters or less.')
@@ -800,6 +801,8 @@ function App() {
 
     const payload = {
       businessName: profile.businessName,
+      email: profile.email,
+      city: profile.city,
       businessType: profile.businessType,
       description: trimmedDescription,
       googleMapsUrl: trimmedLink || '',
@@ -812,7 +815,7 @@ function App() {
     setProfileMessage('')
 
     try {
-      const response = await fetch(`${API_BASE}/business-owners/me/profile`, {
+      const response = await fetch(`${API_BASE}/business-owners/${encodeURIComponent(ownerIdentifier)}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
