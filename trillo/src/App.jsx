@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react'
+import BusinessProfilePage from './business/BusinessProfilePage'
+import { BusinessLoginPage, BusinessSignupPage } from './business/BusinessAuthPages'
 import './App.css'
 
 // Place your logo file in `public/` and name it `thrillo-logo.jpg` (or update this path)
@@ -775,6 +777,8 @@ function App() {
 
   const handleSaveProfile = async () => {
     const trimmedLocation = (profile.location || '').trim()
+    const trimmedDescription = (profile.description || '').trim()
+    const trimmedLink = (profile.locationLink || '').trim()
 
     if (trimmedLocation.length > 200) {
       setProfileError('Location must be 200 characters or less.')
@@ -782,16 +786,23 @@ function App() {
       return
     }
 
-    if (profile.locationLink && !profile.locationLink.startsWith('https://')) {
+    if (trimmedDescription.length > 200) {
+      setProfileError('Description must be 200 characters or less.')
+      setProfileMessage('')
+      return
+    }
+
+    if (trimmedLink && !trimmedLink.startsWith('https://')) {
       setProfileError('Location link must start with https://')
       setProfileMessage('')
       return
     }
 
     const payload = {
+      businessName: profile.businessName,
       businessType: profile.businessType,
-      description: profile.description,
-      googleMapsUrl: profile.locationLink || '',
+      description: trimmedDescription,
+      googleMapsUrl: trimmedLink || '',
       location: trimmedLocation,
       imageUrls: profile.images.filter(Boolean),
     }
@@ -810,15 +821,15 @@ function App() {
       const body = await response.json().catch(() => null)
 
       if (!response.ok) {
-        const message = body?.message || 'Failed to update profile.'
+        const message = body?.errors?.[0] || body?.message || 'Failed to update profile.'
         throw new Error(message)
       }
 
       const updatedProfile = body?.profile || {}
       setProfile((prev) => {
         const nextLocation = updatedProfile.location ?? trimmedLocation
-        const nextDescription = updatedProfile.description ?? prev.description
-        const nextLocationLink = updatedProfile.googleMapsUrl ?? prev.locationLink
+        const nextDescription = updatedProfile.description ?? trimmedDescription ?? prev.description
+        const nextLocationLink = updatedProfile.googleMapsUrl ?? trimmedLink
         const incomingImages = updatedProfile.imageUrls ?? prev.images
         const paddedImages = [...incomingImages]
         while (paddedImages.length < 6) paddedImages.push('')
@@ -856,164 +867,27 @@ function App() {
     switch (pageId) {
       case 'business-signup':
         return (
-          <section className="page-screen business-screen">
-            <div className="form-card">
-              <div className="form-header">
-                <h3>Business Owner</h3>
-                <p>Create a modern presence for your Sri Lankan experience.</p>
-              </div>
-              <div className="input-group two-column">
-                <label>
-                  Business Name
-                  <input placeholder="Lagoon Glow Spa" />
-                </label>
-                <label>
-                  Owner's Name
-                  <input placeholder="Ishara De Silva" />
-                </label>
-              </div>
-              <div className="input-group two-column">
-                <label>
-                  Business Email
-                  <input type="email" placeholder="hello@lagoon-glow.com" />
-                </label>
-                <label>
-                  Location
-                  <input placeholder="Bentota, Sri Lanka" />
-                </label>
-              </div>
-              <label>
-                Category
-                <select>
-                  {businessCategoryOptions.map((category) => (
-                    <option key={category}>{category}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Business Type
-                <div className="pill-row">
-                  {businessTypes.map((type) => (
-                    <span key={type} className="pill">
-                      {type}
-                    </span>
-                  ))}
-                </div>
-              </label>
-              <label>
-                Business Description
-                <textarea rows={3} placeholder="Share your tropical story..." />
-              </label>
-              <label>
-                Services Offered
-                <div className="chip-row">
-                  {servicesOffered.map((service) => (
-                    <span key={service} className="chip">
-                      {service}
-                    </span>
-                  ))}
-                </div>
-              </label>
-              <div className="input-group two-column">
-                <label>
-                  Business Scale
-                  <select>
-                    {businessScaleOptions.map((scale) => (
-                      <option key={scale}>{scale}</option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Contact Number
-                  <input placeholder="+94 77 123 4567" />
-                </label>
-              </div>
-              <div className="input-group two-column">
-                <label>
-                  Password
-                  <input type="password" placeholder="Create a password" />
-                </label>
-                <label>
-                  Confirm Password
-                  <input type="password" placeholder="Re-enter your password" />
-                </label>
-              </div>
-              <label>
-                Upload Images
-                <div className="upload-grid">
-                  {[1, 2, 3, 4, 5].map((slot) => (
-                    <div key={slot} className="upload-box">
-                      <span>＋</span>
-                      <p>Upload</p>
-                    </div>
-                  ))}
-                </div>
-              </label>
-              <button className="cta-button primary full">Create Business Account</button>
-            </div>
-          </section>
+          <BusinessSignupPage
+            businessCategoryOptions={businessCategoryOptions}
+            businessTypes={businessTypes}
+            businessScaleOptions={businessScaleOptions}
+          />
         )
       case 'business-login':
         return (
-          <section className="page-screen login-screen">
-            <div className="form-card">
-              <div className="form-header">
-                <h3>Business Login</h3>
-                <p>Access your dashboard to update listings and respond to travellers.</p>
-              </div>
-              <label>
-                Business Email
-                <input
-                  type="email"
-                  placeholder="owner@trillo.com"
-                  value={loginEmail}
-                  onChange={(e) => {
-                    setLoginEmail(e.target.value)
-                    setAuthError('')
-                    setSignupMessage('')
-                  }}
-                />
-              </label>
-              <label>
-                Password
-                <input
-                  type="password"
-                  placeholder="Enter your password"
-                  value={loginPassword}
-                  onChange={(e) => {
-                    setLoginPassword(e.target.value)
-                    setAuthError('')
-                    setSignupMessage('')
-                  }}
-                />
-              </label>
-              <div className="login-actions">
-                <label className="checkbox">
-                  <input type="checkbox" /> Keep me signed in
-                </label>
-                <button className="text-link">Forgot password-</button>
-              </div>
-              {authError && (
-                <p className="helper-text" style={{ color: '#b00020' }}>
-                  {authError}
-                </p>
-              )}
-              <button className="cta-button primary full" onClick={handleLogin} disabled={authLoading}>
-                {authLoading ? 'Logging in...' : 'Log In'}
-              </button>
-              <p className="helper-text">
-                New partner- <span>Create an account</span>
-              </p>
-            </div>
-            <div className="login-illustration">
-              <h4>Manage your presence</h4>
-              <p>
-                Track inquiries, publish new experiences, and review analytics for all of your
-                Sri Lankan offerings from one hub.
-              </p>
-            </div>
-          </section>
+          <BusinessLoginPage
+            loginEmail={loginEmail}
+            loginPassword={loginPassword}
+            setLoginEmail={setLoginEmail}
+            setLoginPassword={setLoginPassword}
+            authError={authError}
+            authLoading={authLoading}
+            handleLogin={handleLogin}
+            setAuthError={setAuthError}
+            setSignupMessage={setSignupMessage}
+          />
         )
+      case 'traveller-signup':
       case 'traveller-signup':
         return (
           <section className="page-screen traveller-screen">
@@ -1848,250 +1722,28 @@ function App() {
         )
       case 'profile':
         return (
-          <section className="page-screen owner-profile">
-            <div className="profile-header">
-              <button className="icon-circle ghost" onClick={() => setActivePage('home')}>
-                {'<'}
-              </button>
-              <div>
-                <p className="badge">Business</p>
-                <h2>Business Owner Profile</h2>
-                <p className="panel-copy">
-                  Keep your Thrillo presence polished for travellers and partners.
-                </p>
-              </div>
-              <button className="cta-button primary manage" onClick={startManagingProfile}>
-                Manage Your Profile
-              </button>
-            </div>
-
-            {profileMessage && !isManagingProfile && (
-              <div className="toast success floating-toast">{profileMessage}</div>
-            )}
-
-            <div className="profile-grid">
-              <article className="profile-card overview-card">
-                <div className="profile-row">
-                  <div className="profile-icon">BO</div>
-                  <div>
-                    <p className="small-label">Business name</p>
-                    <h3>{profile.businessName}</h3>
-                    <div className="pill soft">{profile.businessType}</div>
-                  </div>
-                </div>
-                <p className="panel-copy">{profile.description.slice(0, 200)}</p>
-                <div className="profile-meta">
-                  <div>
-                    <span className="small-label">Email</span>
-                    <strong>{profile.email}</strong>
-                  </div>
-                  <div>
-                    <span className="small-label">Business location</span>
-                    <strong>{profile.location?.trim() || profile.city || 'No location set'}</strong>
-                  </div>
-                  <div>
-                    <span className="small-label">Gallery</span>
-                    <strong>{profile.images.filter(Boolean).length}/6</strong>
-                  </div>
-                </div>
-              </article>
-              <article className="profile-card gallery-card">
-                <div className="gallery-header">
-                  <div>
-                    <p className="small-label">Live visuals</p>
-                    <h4>Featured gallery</h4>
-                  </div>
-                  <button className="text-link" onClick={startManagingProfile}>
-                    Update images
-                  </button>
-                </div>
-                <div className="profile-gallery">
-                    {profile.images.filter(Boolean).length ? (
-                    profile.images
-                      .filter(Boolean)
-                      .slice(0, 3)
-                      .map((img) => <img key={img} src={img} alt="Business visual" />)
-                  ) : (
-                    <div className="empty-gallery">Add your first image</div>
-                  )}
-                </div>
-                <div className="location-chip">
-                  <span className="icon-circle small map-pin">M</span>
-                  <div>
-                    <p className="small-label">Google Maps link</p>
-                    <strong className="link-text">
-                      {profile.locationLink || 'Add a map link'}
-                    </strong>
-                  </div>
-                </div>
-              </article>
-            </div>
-
-            {isManagingProfile && (
-              <article className="manage-card">
-                <div className="manage-header">
-                  <div>
-                    <p className="badge">Manage Your Profile</p>
-                    <h3>Images and location</h3>
-                    <p className="panel-copy">
-                      Upload up to 6 landscape shots and keep your map pin fresh.
-                    </p>
-                  </div>
-                  <div className="toast-stack">
-                    {profileError ? <div className="toast error">{profileError}</div> : null}
-                    {profileMessage ? <div className="toast success">{profileMessage}</div> : null}
-                  </div>
-                </div>
-                <div className="manage-grid">
-                  <div className="upload-panel">
-                    <div className="image-grid">
-                      {profile.images.map((img, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          className={img ? 'image-slot filled' : 'image-slot'}
-                          onClick={() => {
-                            setActiveSlot(index)
-                            if (fileInputRef.current) fileInputRef.current.click()
-                          }}
-                        >
-                          {img ? (
-                            <img src={img} alt={`Business ${index + 1}`} />
-                          ) : (
-                            <div className="image-placeholder">
-                              <span className="plus">+ Add Image</span>
-                              <p>Landscape works best. Auto-crops on upload.</p>
-                            </div>
-                          )}
-                          <div className="slot-hover">
-                            <span>Replace</span>
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                handleRemoveImage(index)
-                              }}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                    <p className="helper-text muted">Max 6 images. JPG/PNG supported.</p>
-                  </div>
-                  <div className="location-panel">
-                    <label className="location-label">
-                      Business type
-                      <select
-                        value={profile.businessType}
-                        onChange={(e) =>
-                          setProfile((prev) => ({ ...prev, businessType: e.target.value }))
-                        }
-                      >
-                        {ownerBusinessTypes.map((type) => (
-                          <option key={type}>{type}</option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="location-label">
-                      Business location
-                      <input
-                        type="text"
-                        maxLength={200}
-                        placeholder="Enter business location"
-                        value={profile.location || ''}
-                        onChange={(e) =>
-                          setProfile((prev) => ({ ...prev, location: e.target.value }))
-                        }
-                      />
-                      <span className="helper-text">
-                        {Math.max(0, 200 - (profile.location?.length || 0))} characters left
-                      </span>
-                    </label>
-                    <label className="location-label">
-                      Short business description
-                      <textarea
-                        rows={3}
-                        maxLength={200}
-                        value={profile.description}
-                        onChange={(e) =>
-                          setProfile((prev) => ({ ...prev, description: e.target.value }))
-                        }
-                        placeholder="Max 200 characters"
-                      />
-                      <span className="helper-text">
-                        {200 - profile.description.length} characters left
-                      </span>
-                    </label>
-                    <label className="location-label">
-                      Google Maps Location Link
-                      <div className="input-with-icon">
-                        <span className="icon-circle small map-pin">M</span>
-                        <input
-                          type="url"
-                          placeholder="https://maps.google.com/..."
-                          value={profile.locationLink}
-                          onChange={(e) =>
-                            setProfile((prev) => ({ ...prev, locationLink: e.target.value }))
-                          }
-                        />
-                      </div>
-                    </label>
-                    <div className="location-preview-row">
-                      <button className="cta-button ghost" type="button" onClick={toggleLocationPreview}>
-                        Preview Location
-                      </button>
-                      {showLocationPreview && profile.locationLink.startsWith('https://') && (
-                        <div className="map-preview">
-                          <iframe
-                            title="Map preview"
-                            src={profile.locationLink}
-                            loading="lazy"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div className="manage-actions">
-                      <button
-                        type="button"
-                        className="cta-button ghost"
-                        onClick={() => {
-                          setIsManagingProfile(false)
-                          setProfileError('')
-                          setProfileMessage('')
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="cta-button primary"
-                        type="button"
-                        onClick={handleSaveProfile}
-                        disabled={profileSaving}
-                      >
-                        {profileSaving ? 'Saving...' : 'Save Changes'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              style={{ display: 'none' }}
-              onChange={(event) => {
-                handleImageUpload(event.target.files, activeSlot)
-                setActiveSlot(null)
-                event.target.value = ''
-              }}
-            />
-          </section>
+          <BusinessProfilePage
+            profile={profile}
+            setProfile={setProfile}
+            profileMessage={profileMessage}
+            profileError={profileError}
+            isManagingProfile={isManagingProfile}
+            startManagingProfile={startManagingProfile}
+            handleSaveProfile={handleSaveProfile}
+            handleImageUpload={handleImageUpload}
+            handleRemoveImage={handleRemoveImage}
+            toggleLocationPreview={toggleLocationPreview}
+            showLocationPreview={showLocationPreview}
+            fileInputRef={fileInputRef}
+            activeSlot={activeSlot}
+            setActiveSlot={setActiveSlot}
+            setIsManagingProfile={setIsManagingProfile}
+            setProfileError={setProfileError}
+            setProfileMessage={setProfileMessage}
+            profileSaving={profileSaving}
+            ownerBusinessTypes={ownerBusinessTypes}
+            setActivePage={setActivePage}
+          />
         )
       case 'settings':
         return (
@@ -2500,5 +2152,6 @@ function App() {
 }
 
 export default App
+
 
 
