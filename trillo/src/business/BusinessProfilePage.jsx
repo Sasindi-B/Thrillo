@@ -123,13 +123,22 @@ const BusinessProfilePage = ({
             <div className="upload-panel">
               <div className="image-grid">
                 {profile.images.map((img, index) => (
-                  <button
+                  <div
                     key={index}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Image slot ${index + 1}`}
                     className={img ? 'image-slot filled' : 'image-slot'}
                     onClick={() => {
                       setActiveSlot(index)
                       if (fileInputRef.current) fileInputRef.current.click()
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setActiveSlot(index)
+                        if (fileInputRef.current) fileInputRef.current.click()
+                      }
                     }}
                   >
                     {img ? (
@@ -152,7 +161,7 @@ const BusinessProfilePage = ({
                         Remove
                       </button>
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
               <p className="helper-text muted">Max 6 images. JPG/PNG supported.</p>
