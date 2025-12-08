@@ -1,3 +1,31 @@
+import { useEffect, useMemo, useState } from 'react'
+import MembershipStatus from '../membership/MembershipStatus'
+import PackageCard from '../membership/PackageCard'
+import PurchaseModal from '../membership/PurchaseModal'
+import { getPackages, purchaseMembership } from '../services/membershipService'
+import { getUserFromToken } from '../utils/auth'
+
+const fallbackPackages = [
+  {
+    packageType: 'SILVER',
+    name: 'Silver Membership',
+    price: 'LKR 9,900 / year',
+    features: ['Priority listing boosts', 'Owner helpdesk', 'Email support', 'Standard analytics'],
+  },
+  {
+    packageType: 'GOLD',
+    name: 'Gold Membership',
+    price: 'LKR 19,900 / year',
+    features: [
+      'Top placement & badges',
+      'Concierge onboarding',
+      'Priority support',
+      'Advanced analytics',
+      'Featured in campaigns',
+    ],
+  },
+]
+
 const BusinessProfilePage = ({
   profile,
   setProfile,
@@ -20,10 +48,66 @@ const BusinessProfilePage = ({
   ownerBusinessTypes,
   setActivePage,
 }) => {
+  const user = useMemo(() => getUserFromToken(), [])
+  const [packages, setPackages] = useState([])
+  const [membershipLoading, setMembershipLoading] = useState(true)
+  const [packagesError, setPackagesError] = useState('')
+  const [selectedPackage, setSelectedPackage] = useState(null)
+  const [processingPurchase, setProcessingPurchase] = useState(false)
+  const [toast, setToast] = useState('')
+  const [modalError, setModalError] = useState('')
+  const [statusRefreshKey, setStatusRefreshKey] = useState(0)
+
   const handleCancel = () => {
     setIsManagingProfile(false)
     setProfileError('')
     setProfileMessage('')
+  }
+
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        setMembershipLoading(true)
+        setPackagesError('')
+        const result = await getPackages()
+        setPackages(Array.isArray(result) ? result : fallbackPackages)
+      } catch (error) {
+        console.error(error)
+        setPackagesError('Unable to load membership packages right now. Showing defaults.')
+        setPackages(fallbackPackages)
+      } finally {
+        setMembershipLoading(false)
+      }
+    }
+
+    loadPackages()
+  }, [])
+
+  const handleSelectPackage = (pkg) => {
+    setSelectedPackage(pkg)
+    setToast('')
+    setModalError('')
+  }
+
+  const handlePurchaseMembership = async () => {
+    if (!user?.id || !selectedPackage) {
+      setModalError('Sign in as a business owner to purchase a membership.')
+      return
+    }
+
+    try {
+      setProcessingPurchase(true)
+      setModalError('')
+      setToast('')
+      await purchaseMembership(user.id, selectedPackage.packageType)
+      setToast(`You are now on ${selectedPackage.name}!`)
+      setStatusRefreshKey((prev) => prev + 1)
+    } catch (error) {
+      console.error(error)
+      setModalError(error?.response?.data?.message || 'Purchase failed. Please try again.')
+    } finally {
+      setProcessingPurchase(false)
+    }
   }
 
   return (
@@ -102,6 +186,41 @@ const BusinessProfilePage = ({
             </div>
           </div>
         </article>
+      </div>
+
+      <div className="membership-grid">
+        <div className="packages-column">
+          <div className="membership-card status-card">
+            <p className="small-label">Membership</p>
+            <h3>Grow your Thrillo reach</h3>
+            <p className="panel-copy">
+              Boost placement with Silver or unlock premium support and analytics with Gold.
+            </p>
+          </div>
+          {membershipLoading ? (
+            <div className="membership-card status-card">
+              <h4>Loading packages...</h4>
+            </div>
+          ) : (
+            <>
+              {packagesError ? <div className="toast error">{packagesError}</div> : null}
+              <div className="package-grid">
+                {packages.map((pkg) => (
+                  <PackageCard key={pkg.packageType} pkg={pkg} onSelect={handleSelectPackage} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+        <div className="status-column">
+          <MembershipStatus businessOwnerId={user?.id} onRefreshTrigger={statusRefreshKey} />
+          <div className="membership-card note-card">
+            <p className="small-label">Need help?</p>
+            <p className="panel-copy">
+              Questions about benefits or billing? Reach us via your account manager or hello@thrillo.com.
+            </p>
+          </div>
+        </div>
       </div>
 
       {isManagingProfile && (
@@ -253,6 +372,15 @@ const BusinessProfilePage = ({
           </div>
         </article>
       )}
+      <PurchaseModal
+        open={Boolean(selectedPackage)}
+        pkg={selectedPackage}
+        onClose={() => setSelectedPackage(null)}
+        onConfirm={handlePurchaseMembership}
+        loading={processingPurchase}
+        message={toast}
+        error={modalError}
+      />
       <input
         ref={fileInputRef}
         type="file"
@@ -270,4 +398,3 @@ const BusinessProfilePage = ({
 }
 
 export default BusinessProfilePage
-
