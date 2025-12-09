@@ -9,13 +9,13 @@ const fallbackPackages = [
   {
     packageType: 'SILVER',
     name: 'Silver Membership',
-    price: 'LKR 9,900 / year',
+    price: 'Rs. 150,000 per year or Rs. 1,500 per month',
     features: ['Priority listing boosts', 'Owner helpdesk', 'Email support', 'Standard analytics'],
   },
   {
     packageType: 'GOLD',
     name: 'Gold Membership',
-    price: 'LKR 19,900 / year',
+    price: 'Rs. 30,000 per year or Rs. 3,000 per month',
     features: [
       'Top placement & badges',
       'Concierge onboarding',
