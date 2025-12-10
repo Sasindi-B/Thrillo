@@ -1032,9 +1032,7 @@ function App() {
         return (
           <section className="page-screen home-screen">
             <div className="top-bar">
-              <div className="icon-circle">🔔</div>
               <ThrilloLogo size={72} className="logo-mark" />
-              <div className="icon-circle">⚙️</div>
             </div>
             <div className="card-section">
               <h4>Our Services</h4>
@@ -1050,17 +1048,15 @@ function App() {
               className="hero-banner"
               style={{
                 backgroundImage:
-                  'linear-gradient(140deg, rgba(0, 23, 51, 0.32), rgba(0, 119, 200, 0.28)), url(https://media.cntravellerme.com/photos/66e42e99f6574c75a326fdd9/16:9/w_2560%2Cc_limit/505221662)',
+                  'linear-gradient(120deg, rgba(5, 28, 57, 0.55), rgba(0, 152, 197, 0.36)), url(/sl-hero.jpg)',
               }}
             >
-              <div>
-                <p className="badge">Season 2025</p>
+              <div className="hero-overlay" />
+              <div className="hero-content">
+                <p className="badge glassy">Season 2025</p>
                 <h3>Explore Sri Lanka</h3>
-                <p>Coastlines, hill country, and vibrant city nights.</p>
+                <p className="hero-subtitle">Coastlines, hill country, and vibrant city nights.</p>
               </div>
-            </div>
-            <div className="plan-trip-action">
-              <button className="cta-button primary">Plan a Trip</button>
             </div>
             <div className="auth-hub">
               <div className="auth-header">
@@ -2157,6 +2153,10 @@ function App() {
 }
 
 export default App
+
+
+
+
 
 
 
