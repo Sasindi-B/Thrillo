@@ -3,8 +3,8 @@ import BusinessProfilePage from './business/BusinessProfilePage'
 import { BusinessLoginPage, BusinessSignupPage } from './business/BusinessAuthPages'
 import './App.css'
 
-// Place your logo file in `public/` and name it `thrillo-logo.jpg` (or update this path)
-const logoSrc = '/thrillo-logo.jpg'
+// Place your logo file in `public/` and name it `thrillo-logo.png` (or update this path)
+const logoSrc = '/thrillo-logo.png'
 
 const ThrilloLogo = ({ size = 64, className = '' }) => {
   const [error, setError] = useState(false)
@@ -1058,12 +1058,14 @@ function App() {
                 <h3>Explore Sri Lanka</h3>
                 <p>Coastlines, hill country, and vibrant city nights.</p>
               </div>
-              <button className="cta-button ghost">Plan Trip</button>
+            </div>
+            <div className="plan-trip-action">
+              <button className="cta-button primary">Plan a Trip</button>
             </div>
             <div className="auth-hub">
               <div className="auth-header">
                 <div>
-                  <p className="badge">Unified Access</p>
+                  <p className="badge">Are you a traveller or a business owner?</p>
                   <h4>Choose your role</h4>
                   <p className="panel-copy">
                     Switch between traveller and business to sign in or create an account.
