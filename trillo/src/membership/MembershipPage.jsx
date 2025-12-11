@@ -7,21 +7,32 @@ import { getUserFromToken } from '../utils/auth'
 
 const fallbackPackages = [
   {
+    packageType: 'FREE',
+    name: 'Free',
+    price: 'Rs. 0 - Free version',
+    features: ['Upload 3 business images', 'Visibility in the platform'],
+  },
+  {
     packageType: 'SILVER',
     name: 'Silver Membership',
-    price: 'Rs. 150,000 per year or Rs. 1,500 per month',
-    features: ['Priority listing boosts', 'Owner helpdesk', 'Email support', 'Standard analytics'],
+    price: 'Rs. 30,000/year (first 50 users) or Rs. 3,000/month',
+    features: [
+      'Upload up to 6 business images',
+      '3 boosts per month',
+      'Customer detail access (*conditions applied)',
+    ],
   },
   {
     packageType: 'GOLD',
     name: 'Gold Membership',
-    price: 'Rs. 30,000 per year or Rs. 3,000 per month',
+    price: 'Rs. 50,000/year or Rs. 5,000/month',
     features: [
-      'Top placement & badges',
-      'Concierge onboarding',
+      'Upload up to 6 pics',
+      'Customer details access (*conditions applied)',
+      '7 boosts per month',
+      'Analytics',
+      'Campaign for marketing',
       'Priority support',
-      'Advanced analytics',
-      'Featured in campaigns',
     ],
   },
 ]
@@ -142,4 +153,3 @@ const MembershipPage = () => {
 }
 
 export default MembershipPage
-
