@@ -1058,6 +1058,14 @@ function App() {
                 <p className="hero-subtitle">Coastlines, hill country, and vibrant city nights.</p>
               </div>
             </div>
+            <div className="hero-actions">
+              <button
+                className="cta-button primary"
+                onClick={() => setActivePage('traveller-hotspots')}
+              >
+                Plan your trip
+              </button>
+            </div>
             <div className="auth-hub">
               <div className="auth-header">
                 <div>
@@ -2153,7 +2161,6 @@ function App() {
 }
 
 export default App
-
 
 
 

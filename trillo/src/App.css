@@ -525,6 +525,13 @@ select {
   font-weight: 500;
 }
 
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 6px;
+  flex-wrap: wrap;
+}
+
 .badge.glassy {
   background: rgba(255, 255, 255, 0.18);
   color: #0b1c2c;
@@ -1890,9 +1897,14 @@ select:focus {
 }
 
 .package-grid {
-  display: grid;
+  display: flex;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  flex-wrap: nowrap;
+  align-items: stretch;
+  overflow-x: auto;
+  padding: 8px 6px 10px;
+  margin-top: 12px;
+  justify-content: space-between;
 }
 
 .membership-card {
@@ -1908,9 +1920,18 @@ select:focus {
   background: linear-gradient(135deg, #fff7e6, #fff);
 }
 
+.package-card {
+  min-width: 300px;
+}
+
 .package-card.silver {
   border-color: #8ea6c1;
   background: linear-gradient(135deg, #f3f7fb, #fff);
+}
+
+.package-card.free {
+  border-color: #7ad7c4;
+  background: linear-gradient(135deg, #f1fffb, #fff);
 }
 
 .package-head {
@@ -1970,6 +1991,11 @@ select:focus {
   color: #0b1c2c;
 }
 
+.free-pill {
+  background: #7ad7c4;
+  color: #0b1c2c;
+}
+
 .gold-cta {
   background: linear-gradient(90deg, #f5c542, #f0a500);
   color: #0b1c2c;
@@ -1978,6 +2004,11 @@ select:focus {
 .silver-cta {
   background: linear-gradient(90deg, #8ea6c1, #6b8aa7);
   color: white;
+}
+
+.free-cta {
+  background: linear-gradient(90deg, #7ad7c4, #4cbfa5);
+  color: #0b1c2c;
 }
 
 .status-header {

@@ -14,6 +14,7 @@ const PurchaseModal = ({ open, pkg, onClose, onConfirm, loading, message, error 
 
   if (!open || !pkg) return null
 
+  const variant = pkg.packageType?.toLowerCase?.() || ''
   const isGold = pkg.packageType === 'GOLD'
 
   return (
@@ -30,14 +31,14 @@ const PurchaseModal = ({ open, pkg, onClose, onConfirm, loading, message, error 
             <h3>{pkg.name}</h3>
             <p className="price-line">{pkg.price}</p>
           </div>
-          <span className={`pill ${isGold ? 'gold-pill' : 'silver-pill'}`}>{pkg.packageType}</span>
+          <span className={`pill ${variant ? `${variant}-pill` : ''}`}>{pkg.packageType}</span>
         </div>
         <div className="modal-body">
           <p>You're about to unlock:</p>
           <ul className="feature-list compact">
             {pkg.features?.map((feature) => (
               <li key={feature}>
-                <span className="feature-icon">{isGold ? '★' : '✦'}</span>
+                <span className="feature-icon">{isGold ? 'ƒ~.' : 'ƒoÝ'}</span>
                 <span>{feature}</span>
               </li>
             ))}
@@ -49,7 +50,7 @@ const PurchaseModal = ({ open, pkg, onClose, onConfirm, loading, message, error 
           <button className="cta-button ghost" onClick={onClose} disabled={loading}>
             Cancel
           </button>
-          <button className={`cta-button ${isGold ? 'gold-cta' : 'silver-cta'}`} onClick={onConfirm} disabled={loading}>
+          <button className={`cta-button ${variant ? `${variant}-cta` : ''}`} onClick={onConfirm} disabled={loading}>
             {loading ? 'Processing...' : 'Confirm purchase'}
           </button>
         </div>
@@ -61,7 +62,7 @@ const PurchaseModal = ({ open, pkg, onClose, onConfirm, loading, message, error 
 PurchaseModal.propTypes = {
   open: PropTypes.bool.isRequired,
   pkg: PropTypes.shape({
-    packageType: PropTypes.oneOf(['SILVER', 'GOLD']).isRequired,
+    packageType: PropTypes.oneOf(['FREE', 'SILVER', 'GOLD']).isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     features: PropTypes.arrayOf(PropTypes.string),
@@ -74,4 +75,3 @@ PurchaseModal.propTypes = {
 }
 
 export default PurchaseModal
-
